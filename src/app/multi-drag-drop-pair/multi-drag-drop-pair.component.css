@@ -1,0 +1,19 @@
+.movers {
+  margin: 96px 48px 0;
+}
+
+.movers button {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 18px;
+  padding: 8px 16px;
+  background-color: #f6991b;
+  color: white;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.movers button:disabled {
+  background-color: rgb(163, 155, 155);
+  opacity: 0.3;
+}

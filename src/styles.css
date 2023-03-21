@@ -1,1 +1,45 @@
 /* You can add global styles to this file, and also import other style files */
+@import url("https://pms-dev.stayntouch.com/ui/admin/css/admin-02d2b20118.css");
+
+html,
+body {
+  height: 100%;
+  background: unset;
+  overflow: unset;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+::selection {
+  background-color: unset;
+}
+
+/* Customization */
+.list-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.drag-list {
+  min-width: 400px;
+  border: 1px solid #ccc;
+  padding: 32px;
+  border-radius: 4px;
+  margin-bottom: 0 !important;
+}
+
+.list-item {
+  padding: 8px;
+  color: rgba(0, 0, 0, 0.87);
+  width: 100%;
+  font-size: 14px;
+}
+
+fieldset {
+  padding: 8px;
+  border: none;
+}

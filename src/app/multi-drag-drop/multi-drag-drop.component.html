@@ -1,0 +1,56 @@
+<ul
+  class="drop-list boxes"
+  cdkDropList
+  [id]="listId"
+  [cdkDropListData]="items"
+  (cdkDropListDropped)="itemDroppedInList($event)"
+  [cdkDropListSortingDisabled]="isSortingDisabled"
+>
+  <li
+    *ngFor="let item of items; let i = index"
+    class="drop-box"
+    [class.selected]="isSelected(i)"
+    [class.placeholder]="isDragging && isSelected(i)"
+    cdkDrag
+    (cdkDragStarted)="dragStarted($event, i)"
+    (cdkDragEnded)="dragEnded()"
+    (cdkDragDropped)="dragDropped($event)"
+    (click)="selectItem($event, i)"
+  >
+    <ng-container *ngIf="!isDragging || !isSelected(i)">
+      <!-- Default View -->
+      <ng-container
+        *ngTemplateOutlet="
+          templateRef || itemTemplateRef;
+          context: {
+            $implicit: item,
+            item: item,
+            index: i,
+            selectedCount: selections.length
+          }
+        "
+      ></ng-container>
+    </ng-container>
+
+    <!-- Preview View when multiple items are selected -->
+    <ng-container *ngIf="selections.length">
+      <div
+        *cdkDragPreview
+        class="drag-preview"
+        [attr.data-count]="selections.length"
+      >
+        <ng-container
+          *ngTemplateOutlet="
+            templateRef || itemTemplateRef;
+            context: {
+              $implicit: item,
+              item: item,
+              index: i,
+              selectedCount: selections.length
+            }
+          "
+        ></ng-container>
+      </div>
+    </ng-container>
+  </li>
+</ul>

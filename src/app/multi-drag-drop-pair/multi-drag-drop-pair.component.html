@@ -1,0 +1,49 @@
+<fieldset cdkDropListGroup class="list-wrapper">
+  <div class="entry has-sortable drag-list">
+    <ng-content select="[first-header-content]"></ng-content>
+
+    <multi-drag-drop
+      [listId]="firstListId + '-multi-drag-drop'"
+      [items]="firstItemsList"
+      [isSortingDisabled]="isSortingDisabled"
+      [itemTemplateRef]="firstItemTemplateRef"
+      (selectionChanged)="selectedIndicesInFirstList = $event.selectedIndices"
+      (itemsUpdated)="emitListChangeEvent()"
+      (itemsRemoved)="emitListChangeEvent()"
+      (itemsAdded)="emitListChangeEvent()"
+    >
+    </multi-drag-drop>
+  </div>
+
+  <div class="entry movers">
+    <button
+      type="button"
+      (click)="moveItemsFromFirstToSecond()"
+      [disabled]="!selectedIndicesInFirstList.length"
+    >
+      >
+    </button>
+
+    <button
+      type="button"
+      (click)="moveItemsFromSecondToFirst()"
+      [disabled]="!selectedIndicesInSecondList.length"
+    >
+      <
+    </button>
+  </div>
+
+  <div class="entry has-sortable drag-list">
+    <ng-content select="[second-header-content]"></ng-content>
+
+    <multi-drag-drop
+      [listId]="secondListId + '-multi-drag-drop'"
+      [items]="secondItemsList"
+      [isSortingDisabled]="isSortingDisabled"
+      [itemTemplateRef]="secondItemTemplateRef"
+      (selectionChanged)="selectedIndicesInSecondList = $event.selectedIndices"
+      (itemsUpdated)="emitListChangeEvent()"
+    >
+    </multi-drag-drop>
+  </div>
+</fieldset>
