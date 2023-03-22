@@ -2,8 +2,8 @@ import {
   Input,
   Output,
   Component,
-  EventEmitter,
   TemplateRef,
+  EventEmitter,
 } from '@angular/core';
 import { filterWithMutation, insertItemsAt } from 'src/utils/array';
 

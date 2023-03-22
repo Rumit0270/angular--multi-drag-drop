@@ -98,6 +98,12 @@ export class MultiDragDropComponent implements OnChanges, AfterViewInit {
     return this.selections.length;
   }
 
+  get selectedItems() {
+    // Sorting the indices and returning
+    const sortedSelections = [...this.selections].sort();
+    return sortedSelections.map((i) => this.items[i]);
+  }
+
   /**
    * Handles that gets called when item is dropped into the list
    */
@@ -265,7 +271,7 @@ export class MultiDragDropComponent implements OnChanges, AfterViewInit {
   // For Clearing out the selected item
   // on clicking outside
   @HostListener('document:click', ['$event'])
-  private clickOutside(event: PointerEvent) {
+  clickOutside(event: PointerEvent) {
     const isClickedOutside = !this.elementRef.nativeElement.contains(
       event.target
     );
@@ -273,12 +279,6 @@ export class MultiDragDropComponent implements OnChanges, AfterViewInit {
     if (this.selectedItemsCount && isClickedOutside) {
       this.clearSelections();
     }
-  }
-
-  get selectedItems() {
-    // Sorting the indices and returning
-    const sortedSelections = [...this.selections].sort();
-    return sortedSelections.map((i) => this.items[i]);
   }
 
   selectItem(event: MouseEvent, index: number) {
@@ -294,8 +294,6 @@ export class MultiDragDropComponent implements OnChanges, AfterViewInit {
     this.cdr.detectChanges();
   }
 
-  // Insert if not present
-  // Remove if present
   private updateSelections(index: number, isWithCtrlKey: boolean) {
     const isAlreadySelected = this.isSelected(index);
     const hasMultipleSelectedItems = this.selectedItemsCount > 1;
