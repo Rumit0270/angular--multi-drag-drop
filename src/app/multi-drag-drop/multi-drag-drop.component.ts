@@ -16,6 +16,7 @@ import {
   EventEmitter,
   HostListener,
   SimpleChanges,
+  AfterViewInit,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
@@ -28,7 +29,7 @@ import { filterWithMutation, insertItemsAt } from 'src/utils/array';
   styleUrls: ['./multi-drag-drop.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MultiDragDropComponent implements OnChanges {
+export class MultiDragDropComponent implements OnChanges, AfterViewInit {
   @Input() listId = '';
 
   // Disable dropping withing the same drop list
@@ -62,11 +63,10 @@ export class MultiDragDropComponent implements OnChanges {
   }>();
 
   // Reference of element being dragged
-  // Is maintained to cancel dragging by pressing 'esc' key
-  public dragRef: DragRef | undefined = undefined;
+  private dragRef: DragRef | undefined = undefined;
 
   // Array that tracks which index items are selected
-  public selections: number[] = [];
+  private selections: number[] = [];
 
   constructor(private elementRef: ElementRef, private cdr: ChangeDetectorRef) {}
 
@@ -90,6 +90,14 @@ export class MultiDragDropComponent implements OnChanges {
     return !!this.dragRef;
   }
 
+  isSelected(index: number) {
+    return this.selections.includes(index);
+  }
+
+  get selectedItemsCount() {
+    return this.selections.length;
+  }
+
   /**
    * Handles that gets called when item is dropped into the list
    */
@@ -102,7 +110,7 @@ export class MultiDragDropComponent implements OnChanges {
       event.previousContainer === event.container;
 
     // If an item is moved within a list without selecting
-    if (isDroppedInSameContainer && !this.selections.length) {
+    if (isDroppedInSameContainer && !this.selectedItemsCount) {
       moveItemInArray(
         event.container.data,
         event.previousIndex,
@@ -116,7 +124,7 @@ export class MultiDragDropComponent implements OnChanges {
     const eventData = event.item.data;
 
     // Item is dropped into same container with selections
-    if (isDroppedInSameContainer && this.selections.length) {
+    if (isDroppedInSameContainer && this.selectedItemsCount) {
       this.moveItemPositionsInArray(
         this.items,
         event.currentIndex,
@@ -141,9 +149,14 @@ export class MultiDragDropComponent implements OnChanges {
    * Handler that gets called when an dragging is started for an item
    */
   dragStarted(event: CdkDragStart, index: number) {
+    // Detach this view during dragging to prevent performance issue
+    this.cdr.detach();
+
     this.dragRef = event.source._dragRef;
 
-    const selectionIndices = this.selections.length ? this.selections : [index];
+    const selectionIndices = this.selectedItemsCount
+      ? this.selections
+      : [index];
 
     const eventData = {
       selectionIndices,
@@ -162,6 +175,9 @@ export class MultiDragDropComponent implements OnChanges {
    */
   dragEnded() {
     this.dragRef = undefined;
+
+    // Reattach the detached view
+    this.cdr.reattach();
     this.cdr.detectChanges();
   }
 
@@ -197,7 +213,7 @@ export class MultiDragDropComponent implements OnChanges {
   }
 
   private clearSelections() {
-    if (!this.selections.length) {
+    if (!this.selectedItemsCount) {
       return;
     }
 
@@ -207,20 +223,21 @@ export class MultiDragDropComponent implements OnChanges {
   }
 
   // private selectAllItems() {
-  //   if (this.selections.length === this.items.length) {
+  //   if (this.selectedItemsCount === this.items.length) {
   //     return;
   //   }
 
   //   this.selections = this.items.map((_, index) => index);
-  //   this.selectionChanged.emit(this.items);
+
+  //   this.selectionChanged.emit({
+  //     selectedItems: this.items,
+  //     selectedIndices: this.selections,
+  //   });
+
   //   this.cdr.detectChanges();
   // }
 
-  isSelected(index: number) {
-    return this.selections.includes(index);
-  }
-
-  // handles "ctrl/command + a" to select all
+  // // handles "ctrl/command + a" to select all
   // @HostListener('document:keydown', ['$event'])
   // private handleKeyboardEvent(event: KeyboardEvent) {
   //   // Reset dragging on esc
@@ -237,7 +254,7 @@ export class MultiDragDropComponent implements OnChanges {
   //   if (
   //     event.key === 'a' &&
   //     (event.ctrlKey || event.metaKey) &&
-  //     this.selections.length &&
+  //     this.selectedItemsCount &&
   //     document.activeElement.nodeName !== 'INPUT'
   //   ) {
   //     event.preventDefault();
@@ -249,10 +266,11 @@ export class MultiDragDropComponent implements OnChanges {
   // on clicking outside
   @HostListener('document:click', ['$event'])
   private clickOutside(event: PointerEvent) {
-    if (
-      this.selections.length &&
-      !this.elementRef.nativeElement.contains(event.target)
-    ) {
+    const isClickedOutside = !this.elementRef.nativeElement.contains(
+      event.target
+    );
+
+    if (this.selectedItemsCount && isClickedOutside) {
       this.clearSelections();
     }
   }
@@ -267,12 +285,7 @@ export class MultiDragDropComponent implements OnChanges {
     // CTRL/CMD key
     const isCtrlKey = event.ctrlKey || event.metaKey;
 
-    // Return if CTRL key is not pressed
-    if (!isCtrlKey) {
-      return;
-    }
-
-    this.updateSelections(index);
+    this.updateSelections(index, isCtrlKey);
 
     this.selectionChanged.emit({
       selectedItems: this.selectedItems,
@@ -283,13 +296,25 @@ export class MultiDragDropComponent implements OnChanges {
 
   // Insert if not present
   // Remove if present
-  private updateSelections(index: number) {
-    if (!this.selections.length) {
+  private updateSelections(index: number, isWithCtrlKey: boolean) {
+    const isAlreadySelected = this.isSelected(index);
+    const hasMultipleSelectedItems = this.selectedItemsCount > 1;
+
+    // When an mutliple item is selected and then a single item is selected
+    if (!isWithCtrlKey && isAlreadySelected && hasMultipleSelectedItems) {
       this.selections = [index];
       return;
     }
 
-    const isAlreadySelected = this.selections.includes(index);
+    if (!isWithCtrlKey) {
+      this.selections = isAlreadySelected ? [] : [index];
+      return;
+    }
+
+    if (!this.selectedItemsCount) {
+      this.selections = [index];
+      return;
+    }
 
     if (isAlreadySelected) {
       this.selections = this.selections.filter((i) => i !== index);

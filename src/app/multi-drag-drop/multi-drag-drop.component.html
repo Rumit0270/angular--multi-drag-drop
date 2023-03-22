@@ -12,6 +12,7 @@
     [class.selected]="isSelected(i)"
     [class.placeholder]="isDragging && isSelected(i)"
     cdkDrag
+    cdkDragPreviewContainer="parent"
     (cdkDragStarted)="dragStarted($event, i)"
     (cdkDragEnded)="dragEnded()"
     (cdkDragDropped)="dragDropped($event)"
@@ -26,18 +27,19 @@
             $implicit: item,
             item: item,
             index: i,
-            selectedCount: selections.length
+            selectedCount: selectedItemsCount,
+            isSelected: isSelected(i)
           }
         "
       ></ng-container>
     </ng-container>
 
-    <!-- Preview View when multiple items are selected -->
-    <ng-container *ngIf="selections.length">
+    <!-- Custrom Preview View when multiple items are selected -->
+    <ng-container *ngIf="selectedItemsCount">
       <div
         *cdkDragPreview
         class="drag-preview"
-        [attr.data-count]="selections.length"
+        [attr.data-count]="selectedItemsCount"
       >
         <ng-container
           *ngTemplateOutlet="
@@ -46,7 +48,8 @@
               $implicit: item,
               item: item,
               index: i,
-              selectedCount: selections.length
+              selectedCount: selectedItemsCount,
+              isSelected: isSelected(i)
             }
           "
         ></ng-container>
