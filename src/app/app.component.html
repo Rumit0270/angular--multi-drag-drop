@@ -46,7 +46,8 @@
       [secondItemsList]="done"
       [firstItemTemplateRef]="firstTemplate"
       [secondItemTemplateRef]="secondTemplate"
-      (listChange)="logValues()"
+      (listUpdated)="logValues()"
+      (itemsMoved)="logEvent($event)"
       [isSortingDisabled]="false"
     >
       <h1 first-header-content>TODO</h1>

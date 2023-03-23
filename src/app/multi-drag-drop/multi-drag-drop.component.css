@@ -49,15 +49,15 @@
 }
 
 .drop-box.selected.placeholder {
-  background-color: transparent !important;
+  visibility: hidden;
 }
 
 /* Multi drag Preview */
-.drag-preview {
+/* .drag-preview {
   padding: 20px 10px;
   background: white;
   position: relative;
-}
+} */
 
 .drag-preview::after {
   position: absolute;
@@ -65,11 +65,12 @@
   right: 0;
   top: 0;
   transform: translate(50%, -50%);
-  background: #9dc08b;
+  background: #f6991b;
+  color: white;
   padding: 8px;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   justify-content: center;
   align-items: center;

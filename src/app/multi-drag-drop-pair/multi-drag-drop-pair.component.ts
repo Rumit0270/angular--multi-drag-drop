@@ -6,6 +6,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { filterWithMutation, insertItemsAt } from 'src/utils/array';
+import { ItemsMovedEvent, ItemsOrderChangeEvent } from '../model';
 
 @Component({
   selector: 'multi-drag-drop-pair',
@@ -28,7 +29,9 @@ export class MultiDragDropPairComponent {
   @Input() secondItemTemplateRef: TemplateRef<any>;
 
   // Fires event when either of the list changes
-  @Output() listChange = new EventEmitter<void>();
+  @Output() itemsMoved = new EventEmitter<ItemsMovedEvent>();
+
+  @Output() listUpdated = new EventEmitter<ItemsOrderChangeEvent>();
 
   // selectedItems
   selectedIndicesInFirstList: number[] = [];
@@ -45,7 +48,12 @@ export class MultiDragDropPairComponent {
       this.secondItemsList.length,
       ...removedItems
     );
-    this.listChange.emit();
+
+    this.itemsMoved.emit({
+      isMovedFromFirstToSecond: true,
+      isMovedFromSecondToFirst: false,
+      movedItems: removedItems,
+    });
   }
 
   moveItemsFromSecondToFirst() {
@@ -60,13 +68,38 @@ export class MultiDragDropPairComponent {
       ...removedItems
     );
 
-    this.listChange.emit();
+    this.itemsMoved.emit({
+      isMovedFromFirstToSecond: false,
+      isMovedFromSecondToFirst: true,
+      movedItems: removedItems,
+    });
   }
 
-  // Emit after next tick to prevent race condition
-  emitListChangeEvent() {
+  // Need to defer emitting of event
+  // to prevent race conditions
+  handleItemsUpdated(isFirstList: boolean) {
     setTimeout(() => {
-      this.listChange.emit();
+      this.listUpdated.emit({ isFirstList });
+    });
+  }
+
+  handleItemsAddedInFirstList(movedItems: any[]) {
+    setTimeout(() => {
+      this.itemsMoved.emit({
+        isMovedFromFirstToSecond: false,
+        isMovedFromSecondToFirst: true,
+        movedItems,
+      });
+    });
+  }
+
+  handleItemsRemovedInFirstList(movedItems: any[]) {
+    setTimeout(() => {
+      this.itemsMoved.emit({
+        isMovedFromFirstToSecond: true,
+        isMovedFromSecondToFirst: false,
+        movedItems,
+      });
     });
   }
 }

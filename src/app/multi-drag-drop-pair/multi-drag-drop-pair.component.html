@@ -8,9 +8,9 @@
       [isSortingDisabled]="isSortingDisabled"
       [itemTemplateRef]="firstItemTemplateRef"
       (selectionChanged)="selectedIndicesInFirstList = $event.selectedIndices"
-      (itemsUpdated)="emitListChangeEvent()"
-      (itemsRemoved)="emitListChangeEvent()"
-      (itemsAdded)="emitListChangeEvent()"
+      (itemsUpdated)="handleItemsUpdated(true)"
+      (itemsRemoved)="handleItemsRemovedInFirstList($event)"
+      (itemsAdded)="handleItemsAddedInFirstList($event)"
     >
     </multi-drag-drop>
   </div>
@@ -42,7 +42,7 @@
       [isSortingDisabled]="isSortingDisabled"
       [itemTemplateRef]="secondItemTemplateRef"
       (selectionChanged)="selectedIndicesInSecondList = $event.selectedIndices"
-      (itemsUpdated)="emitListChangeEvent()"
+      (itemsUpdated)="handleItemsUpdated(false)"
     >
     </multi-drag-drop>
   </div>

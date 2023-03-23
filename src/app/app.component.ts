@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ItemsMovedEvent } from './model';
 
 @Component({
   selector: 'app-root',
@@ -33,5 +34,9 @@ export class AppComponent {
   logUsers() {
     console.log('Restricted', this.restictedUsers);
     console.log('Unrestricted', this.unrestrictedUsers);
+  }
+
+  logEvent(event: ItemsMovedEvent<string>) {
+    console.log(event);
   }
 }

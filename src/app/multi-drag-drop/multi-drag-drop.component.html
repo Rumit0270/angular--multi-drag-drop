@@ -13,6 +13,8 @@
     [class.placeholder]="isDragging && isSelected(i)"
     cdkDrag
     cdkDragPreviewContainer="parent"
+    [cdkDragPreviewClass]="selectedItemsCount > 1 ? 'drag-preview' : ''"
+    [attr.data-count]="selectedItemsCount"
     (cdkDragStarted)="dragStarted($event, i)"
     (cdkDragEnded)="dragEnded()"
     (cdkDragDropped)="dragDropped($event)"
@@ -34,8 +36,8 @@
       ></ng-container>
     </ng-container>
 
-    <!-- Custrom Preview View when multiple items are selected -->
-    <ng-container *ngIf="selectedItemsCount">
+    <!-- Custom Preview View when multiple items are selected -->
+    <!-- <ng-container *ngIf="selectedItemsCount > 1">
       <div
         *cdkDragPreview
         class="drag-preview"
@@ -54,6 +56,6 @@
           "
         ></ng-container>
       </div>
-    </ng-container>
+    </ng-container> -->
   </li>
 </ul>

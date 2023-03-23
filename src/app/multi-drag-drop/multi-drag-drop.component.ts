@@ -23,6 +23,8 @@ import {
 
 import { filterWithMutation, insertItemsAt } from 'src/utils/array';
 
+import { ItemSelectionChangeEvent } from '../model';
+
 @Component({
   selector: 'multi-drag-drop',
   templateUrl: './multi-drag-drop.component.html',
@@ -57,10 +59,7 @@ export class MultiDragDropComponent implements OnChanges, AfterViewInit {
   @Output() itemsUpdated = new EventEmitter<any[]>();
 
   // Event that gets emitted when the selected items are changed
-  @Output() selectionChanged = new EventEmitter<{
-    selectedItems: any[];
-    selectedIndices: number[];
-  }>();
+  @Output() selectionChanged = new EventEmitter<ItemSelectionChangeEvent>();
 
   // Reference of element being dragged
   private dragRef: DragRef | undefined = undefined;

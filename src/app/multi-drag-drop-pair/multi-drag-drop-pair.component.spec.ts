@@ -30,7 +30,7 @@ describe('MultiDragDropPairComponent', () => {
 
   describe('moveItemsFromFirstToSecond', () => {
     it('should move selected items from first to second list', () => {
-      spyOn(component.listChange, 'emit');
+      spyOn(component.itemsMoved, 'emit');
 
       component.firstItemsList = [1, 2, 3];
       component.secondItemsList = [4, 5, 6];
@@ -40,11 +40,11 @@ describe('MultiDragDropPairComponent', () => {
 
       expect(component.firstItemsList).toEqual([3]);
       expect(component.secondItemsList).toEqual([4, 5, 6, 1, 2]);
-      expect(component.listChange.emit).toHaveBeenCalled();
+      expect(component.itemsMoved.emit).toHaveBeenCalled();
     });
 
     it('should move selected items from second to first list', () => {
-      spyOn(component.listChange, 'emit');
+      spyOn(component.itemsMoved, 'emit');
 
       component.firstItemsList = [1, 2, 3];
       component.secondItemsList = [4, 5, 6];
@@ -54,16 +54,44 @@ describe('MultiDragDropPairComponent', () => {
 
       expect(component.firstItemsList).toEqual([1, 2, 3, 4, 5]);
       expect(component.secondItemsList).toEqual([6]);
-      expect(component.listChange.emit).toHaveBeenCalled();
+      expect(component.itemsMoved.emit).toHaveBeenCalled();
     });
   });
 
-  it('should emit listChange event', fakeAsync(() => {
-    spyOn(component.listChange, 'emit');
+  it('should emit listUpdated event', fakeAsync(() => {
+    spyOn(component.listUpdated, 'emit');
 
-    component.emitListChangeEvent();
+    component.handleItemsUpdated(false);
     tick();
 
-    expect(component.listChange.emit).toHaveBeenCalled();
+    expect(component.listUpdated.emit).toHaveBeenCalled();
+  }));
+
+  it('should emit itemsMoved event when item are added in first list', fakeAsync(() => {
+    let isMovedFromSecondToFirst = false;
+
+    spyOn(component.itemsMoved, 'emit').and.callFake((event) => {
+      isMovedFromSecondToFirst = event.isMovedFromSecondToFirst;
+    });
+
+    component.handleItemsAddedInFirstList([]);
+    tick();
+
+    expect(component.itemsMoved.emit).toHaveBeenCalled();
+    expect(isMovedFromSecondToFirst).toBeTrue();
+  }));
+
+  it('should emit itemsMoved event when item are removed from first list', fakeAsync(() => {
+    let isMovedFromFirstToSecond = false;
+
+    spyOn(component.itemsMoved, 'emit').and.callFake((event) => {
+      isMovedFromFirstToSecond = event.isMovedFromFirstToSecond;
+    });
+
+    component.handleItemsRemovedInFirstList([]);
+    tick();
+
+    expect(component.itemsMoved.emit).toHaveBeenCalled();
+    expect(isMovedFromFirstToSecond).toBeTrue();
   }));
 });
